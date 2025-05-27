@@ -1,0 +1,12 @@
+<template>
+  <div class="flex flex-col items-center justify-center py-8 mb-6">
+    <div class="w-16 h-16 mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126.61 126.61" fill="#F0B90B">
+        <path d="M38.73,53.2,63.3,28.63,87.91,53.2,102.64,38.47,63.3,0,23.92,38.47ZM28.63,63.3,43.36,48.57,58.09,63.3,43.36,78Zm29.41,0L82.67,38.68l14.73,14.73L82.67,68.14Zm0,48.56L33.47,87.29,48.2,72.56,63.3,87.56,78.35,72.51l14.73,14.73Z"></path>
+        <path d="M97.65,63.3l-9.78-9.78L78.09,63.3l9.78,9.78Zm28.96,0L87.29,33.47,72.56,48.2,57.67,33.31,43.31,48.25,28.56,33.5,0,63.3l28.56,29.8L43.31,78.35l14.41,14.29,14.66-14.54,14.73,14.73Z"></path>
+      </svg>
+    </div>
+    <h1 class="text-3xl md:text-4xl font-bold mb-2 text-center">Binance Alpha Tool</h1>
+    <p class="text-text-secondary text-center text-sm md:text-base">币安Alpha智能查询工具，所有数据来源于区块链</p>
+  </div>
+</template>
