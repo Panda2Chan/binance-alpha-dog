@@ -64,6 +64,7 @@ const getPercentage = (): number => {
 <style scoped>
 input[type="range"] {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
   height: 12px;
   background: transparent;

@@ -6,7 +6,7 @@ import TransactionUtils from "./transaction";
  */
 export default class ApiUtils {
     static BSC_SCAN_API_URL = 'https://api.bscscan.com/api';
-    static BINANCE_API_URL = 'https://price.lzq.dev/price';
+    static BINANCE_API_URL = 'https://api.binance.com/api/v3/ticker/price';
     static TARGET_CONTRACT = '0xb300000b72DEAEb607a12d5f54773D1C19c7028d'.toLowerCase();
     // 价格缓存
     static priceCache = new Map();

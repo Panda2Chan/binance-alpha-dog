@@ -19,10 +19,36 @@ import TransactionUtils from './utils/transaction'
 const balanceScore = ref<number>(0);
 const filteredTransactions = ref<any[]>([]);
 const totalVolume = ref<any>();
-const searchQuery = ref('0xAc285F9BF78eC7B16cb1999A5c7Ddd7867C3e3c9');
+const searchQuery = ref('0x04f843b19c7d639b1a2b1620ccb9bfaf2c935fd6');
 const clearSearch = () => {
   searchQuery.value = '';
 };
+
+
+
+// 今日交易量
+const totalTradeAmount = computed(() => {
+  return (totalVolume.value?.totalOutflowValue || 0).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 3,
+  })
+});
+
+// 今日积分
+/**
+ * 积分 = 交易量 + 余额
+ * 交易量2u 1分；4u 2分；8u 3分；以此类推
+ * 余额 0 1 2 3 4 分
+ */
+const todayTotalScore = computed(() => {
+  // 交易量2u 1分；4u 2分；8u 3分；以此类推
+  const tradeScore = TransactionUtils.calculatePoints(totalVolume.value?.totalOutflowValue);
+  console.log("tradeScore", tradeScore);
+
+  return tradeScore + balanceScore.value;
+});
+
 
 
 
@@ -73,7 +99,7 @@ const handleSearch = async (address: string) => {
       <QuickActions />
       <FilterSlider v-model="balanceScore" />
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <DailyStats transactionCount="2" pointsCount="1" amount="$0" points="+0" />
+        <DailyStats transactionCount="2" pointsCount="1" :amount="totalTradeAmount" :points="`+${todayTotalScore}`" />
       </div>
       <OverallStats totalVolume="$258,661.165" totalPoints="+156" />
       <Calculator />

@@ -393,7 +393,7 @@ export default class TransactionUtils {
         if (outflowValue <= 0) return 0;
 
         // 积分计算逻辑：1 + log2(流出价值)
-        const points = 1 + Math.floor(Math.log2(outflowValue));
+        const points = Math.floor(Math.log2(outflowValue));
         return points > 0 ? points : 0;
     }
 }
