@@ -167,6 +167,13 @@ const getFlowData = (transactions: any[]) => {
                         {{ transaction.status }}
                       </span>
                     </template>
+                    <template v-else-if="['inflow', 'outflow'].includes(item.key)">
+                      <span v-if="!transaction[item.key] || transaction[item.key] === '0'">–</span>
+                      <span v-else :class="item.key === 'inflow' ? 'text-green-500' : 'text-red-500'">
+                        {{ transaction[item.key] }}
+                      </span>
+                    </template>
+
                     <template v-else>
                       {{ transaction[item.key] }}
                     </template>
