@@ -1,7 +1,8 @@
 {
   "name": "binance-alpha-tool",
   "private": true,
-  "version": "0.0.0",
+  "author": "PanChan",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
