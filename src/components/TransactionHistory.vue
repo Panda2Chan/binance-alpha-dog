@@ -68,13 +68,14 @@ const getCount = (transactions: any[]): number => {
   return transactions?.length || 0
 }
 const columns = [
-  { title: "交易哈希", key: "hash" },
+  { title: "交易哈希", key: "hash", type: 'custom' },
   { title: "时间", key: "timeStamp" },
   { title: "代币", key: "coin" },
-  { title: "转入", key: "inflow" },
-  { title: "转出", key: "outflow" },
-  { title: "状态", key: "status" },
+  { title: "转入", key: "inflow", type: 'custom' },
+  { title: "转出", key: "outflow", type: 'custom' },
+  { title: "状态", key: "status", type: 'custom' },
 ]
+
 
 
 const getFlowData = (transactions: any[]) => {
@@ -83,19 +84,40 @@ const getFlowData = (transactions: any[]) => {
     Object.entries(item.tokens).forEach(([key, value]: [string, any]) => {
       if (value.inflow === 0 && value.outflow == 0) return
       res.push({
-        hash: item.hash,
-        hashFormat: ValidationUtils.formatTransactionHash(item.hash),
+        hash: () => {
+          const formatHash = ValidationUtils.formatTransactionHash(item.hash)
+          return <a href={`https://bscscan.com/tx/${item.hash}`} target="_blank"
+            class="text-binance-yellow hover:underline">
+            {formatHash}
+          </a>
+        },
         timeStamp: dayjs(item.timeStamp * 1000).format('HH:mm:ss'),
         coin: key,
-        inflow: ValidationUtils.formatTokenAmount(value.inflow),
-        outflow: ValidationUtils.formatTokenAmount(value.outflow),
-        status: item.status,
+        inflow: () => {
+          if (!value.inflow) return <span>–</span>
+          return <span class="text-green-500">
+            {ValidationUtils.formatTokenAmount(value.inflow)}
+          </span>
+        },
+        outflow: () => {
+          if (!value.outflow) return <span>–</span>
+          return <span class="text-red-500">
+            {ValidationUtils.formatTokenAmount(value.outflow)}
+          </span>
+        },
+        status: () => {
+          return <span class={`${item.status === '成功' ? 'text-green-300 bg-green-900' : 'text-red-300 bg-red-900'}
+          inline-flex items-center px-1 sm:px-2 py-0.5 rounded-full text-[11px] sm:text-xs `}>
+            {item.status ? '成功' : '失败'}
+          </span>
+        },
       })
     })
   })
 
   return res
 }
+
 
 
 </script>
@@ -155,25 +177,9 @@ const getFlowData = (transactions: any[]) => {
               <tbody class="divide-y divide-card-border">
                 <tr v-for="(transaction, transIndex) in getFlowData(day.transactions)" :key="transIndex">
                   <td v-for="item in columns" class="px-4 py-3 text-sm">
-
-                    <template v-if="item.key === 'hash'">
-                      <a :href="`https://bscscan.com/tx/${transaction.hash}`" target="_blank"
-                        class="text-binance-yellow hover:underline">
-                        {{ transaction.hashFormat }}
-                      </a>
+                    <template v-if="item.type === 'custom'">
+                      <component :is="transaction[item.key]"></component>
                     </template>
-                    <template v-else-if="item.key === 'status'">
-                      <span :class="transaction.status === '成功' ? 'text-green-500' : 'text-red-500'">
-                        {{ transaction.status }}
-                      </span>
-                    </template>
-                    <template v-else-if="['inflow', 'outflow'].includes(item.key)">
-                      <span v-if="!transaction[item.key] || transaction[item.key] === '0'">–</span>
-                      <span v-else :class="item.key === 'inflow' ? 'text-green-500' : 'text-red-500'">
-                        {{ transaction[item.key] }}
-                      </span>
-                    </template>
-
                     <template v-else>
                       {{ transaction[item.key] }}
                     </template>
