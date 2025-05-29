@@ -143,7 +143,7 @@ const getFlowData = (transactions: any[]) => {
             </div>
           </div>
 
-          <div v-if="expandIndexMap[index]" class="border-t border-card-border p-4 ">
+          <div v-if="expandIndexMap[index]" class="border-t border-card-border p-4  overflow-auto">
             <table class="w-full table-auto  rounded-lg overflow-hidden shadow-md">
               <thead class="bg-card-bg text-text-secondary">
                 <tr>

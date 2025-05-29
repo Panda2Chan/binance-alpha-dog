@@ -23,7 +23,7 @@ const filteredTransactions = ref<any[]>([]);
 const totalAmount = ref<number>(0);
 const todayAmount = ref<number>(0);
 const isLoading = ref<boolean>(false);
-const searchQuery = ref('0x04f843b19c7d639b1a2b1620ccb9bfaf2c935fd6');
+const searchQuery = ref('');
 const clearSearch = () => {
   searchQuery.value = '';
 };

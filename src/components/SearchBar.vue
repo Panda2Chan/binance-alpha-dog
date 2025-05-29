@@ -66,8 +66,8 @@ const handleBlur = () => {
     <div v-if="showAddresses && addresses.length > 0"
       class="absolute w-full  bg-card-bg border border-card-border rounded-lg mt-1 z-10">
       <ul>
-        <li v-for="(address, index) in addresses" :key="index" class="py-2 px-4 flex justify-between items-center"
-          @click="selectAddress(address)">
+        <li v-for="(address, index) in addresses" :key="index"
+          class="text-sm py-2 px-4 flex justify-between items-center" @click="selectAddress(address)">
           <span>{{ address }}</span>
           <button @click.stop="deleteAddress(index)" class="text-text-tertiary hover:text-text-secondary p-1">
             <Trash2 />
