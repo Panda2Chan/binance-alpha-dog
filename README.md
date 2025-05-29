@@ -2,6 +2,9 @@
 
 本项目是一个基于 Vue 3、TypeScript 和 Vite 构建的区块链交易查询与统计工具。用户可以通过输入 BSC 地址，查询该地址的交易记录，并统计每日和总交易量、消耗总量以及获得的积分。
 
+## 预览地址
+[http://b.soouu.com/](http://b.soouu.com/)
+
 ## 技术栈
 - **前端框架**：Vue 3 + TypeScript
 - **构建工具**：Vite
@@ -52,5 +55,6 @@ src/
 3. 提交你的更改 (`git commit -am 'Add some feature'`).
 4. 推送到分支 (`git push origin feature/your-feature`).
 5. 提交 Pull Request.
+
 
 
