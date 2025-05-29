@@ -11,13 +11,13 @@ defineProps<{
 
 <template>
   <div>
-    <h3 class="text-sm text-text-secondary font-medium mb-4">
+    <h2 class="text-xl font-medium mb-6">
       今日统计
-      <span class="block text-xs mt-1">
+      <span class="block text-xs mt-2 text-text-secondary">
         北京时间: 08:00 - 08:00 (UTC: 00:00 - 23:59)
       </span>
-    </h3>
-    
+    </h2>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="bg-card-bg border border-card-border rounded-lg p-4">
         <h4 class="text-sm text-text-secondary mb-2">今日交易量</h4>
@@ -26,7 +26,7 @@ defineProps<{
           还差{{ transactionCount }}笔 +{{ pointsCount }}积分
         </p>
       </div>
-      
+
       <div class="bg-card-bg border border-card-border rounded-lg p-4">
         <h4 class="text-sm text-text-secondary mb-2">今日预计积分</h4>
         <p class="text-2xl font-bold text-binance-yellow mb-2">{{ points }} 积分</p>

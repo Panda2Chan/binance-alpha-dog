@@ -1,7 +1,13 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "preserve",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "moduleResolution": "node",
+    "types": ["vite/client"],
+    "allowSyntheticDefaultImports":true,
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "shims-jsx.d.ts"]
 }

@@ -60,7 +60,7 @@ export default class ValidationUtils {
      * @param {number} length - 显示的长度
      * @returns {string} 截断后的哈希
      */
-    static formatTransactionHash(hash, length = 10) {
+    static formatTransactionHash(hash, length = 5) {
         if (!hash || typeof hash !== 'string') {
             return '';
         }
@@ -78,7 +78,7 @@ export default class ValidationUtils {
      * @param {number} decimals - 小数位数
      * @returns {string} 格式化后的数量
      */
-    static formatTokenAmount(amount, decimals = 6) {
+    static formatTokenAmount(amount, decimals = 3) {
         if (typeof amount !== 'number') {
             return '0';
         }
@@ -89,5 +89,13 @@ export default class ValidationUtils {
         }
         
         return amount.toFixed(decimals);
+    }
+
+    static formatMoney(amount, decimals = 3) {
+       return (amount).toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: decimals,
+      })
     }
 }
