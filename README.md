@@ -1,4 +1,3 @@
-```
 # 项目介绍
 
 本项目是一个基于 Vue 3、TypeScript 和 Vite 构建的区块链交易查询与统计工具。用户可以通过输入 BSC 地址，查询该地址的交易记录，并统计每日和总交易量、消耗总量以及获得的积分。
@@ -18,12 +17,12 @@
 
 ## 安装步骤
 ```bash
-npm install
+pnpm install
 ```
 
 ## 运行方法
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ## 项目结构
