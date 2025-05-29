@@ -34,7 +34,7 @@
       <!-- Balance Points Table -->
       <div class="mb-6">
         <h3 class="text-lg font-medium mb-4">余额积分（每日）</h3>
-        <div class="border border-gray-700 rounded-lg overflow-hidden">
+        <div class="border border-gray-700 rounded-lg overflow-auto">
           <table class="w-full">
             <thead>
               <tr class="border-b border-gray-700">
@@ -61,7 +61,7 @@
       <!-- Trading Volume Points Table -->
       <div class="mb-6">
         <h3 class="text-lg font-medium mb-4">交易量积分（每日）</h3>
-        <div class="border border-gray-700 rounded-lg overflow-hidden">
+        <div class="border border-gray-700 rounded-lg overflow-auto">
           <table class="w-full">
             <thead>
               <tr class="border-b border-gray-700">
@@ -93,7 +93,7 @@
       <!-- Best Strategy -->
       <div class="mb-6">
         <h3 class="text-lg font-medium mb-4">最佳策略（每日）</h3>
-        <div class="border border-gray-700 rounded-lg overflow-hidden">
+        <div class="border border-gray-700 rounded-lg overflow-auto">
           <table class="w-full">
             <tbody>
               <tr class="border-b border-gray-700">
