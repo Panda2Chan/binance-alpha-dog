@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from 'vue';
+import { defineProps, defineEmits, ref, computed } from 'vue';
 import { Loader, Search, X, Trash2 } from 'lucide-vue-next'
 // @ts-ignore
 import StorageUtils from '../utils/storage'
+import { useAppStore } from '../store/index.store';
 const props = defineProps<{
   modelValue: string
   loading: boolean
-  washTrade:boolean
 }>();
 
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void,
-  (e: 'update:washTrade', value: boolean): void,
   (e: 'clear'): void,
   (e: 'submit', value: string): void
 }>();
 
-
+const appStore = useAppStore()
+const washTradeSwitch = computed(() => appStore.washTradeSwitch)
 const addresses = ref(StorageUtils.loadAddresses() || []);
 
 // 控制历史记录框是否显示
@@ -49,9 +49,8 @@ const handleBlur = () => {
 };
 
 const handleChangeWashTrade = () => {
-  const newValue = !props.washTrade
-  emits('update:washTrade', newValue);
-  StorageUtils.save('washTrade', newValue);
+  const newValue = !washTradeSwitch.value
+  appStore.setWashTradeSwitch(newValue)
 }
 
 </script>
@@ -92,12 +91,12 @@ const handleChangeWashTrade = () => {
       <span class="text-sm text-text-secondary mr-2">统计对刷</span>
       <button 
         class="w-12 h-6 rounded-full relative transition-colors duration-200 ease-in-out"
-        :class="[washTrade ? 'bg-binance-yellow' : 'bg-gray-600']"
+        :class="[washTradeSwitch ? 'bg-binance-yellow' : 'bg-gray-600']"
         @click="handleChangeWashTrade"
       >
         <span 
           class="absolute w-5 h-5 bg-white rounded-full transform transition-transform duration-200 ease-in-out"
-          :class="[washTrade ? 'translate-x-0' : '-translate-x-5']"
+          :class="[washTradeSwitch ? 'translate-x-0' : '-translate-x-5']"
           style="top: 2px;"
         ></span>
       </button>

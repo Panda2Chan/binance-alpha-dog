@@ -12,6 +12,8 @@
   "dependencies": {
     "dayjs": "^1.11.13",
     "lucide-vue-next": "^0.511.0",
+    "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.3.0",
     "vue": "^3.4.38"
   },
   "devDependencies": {

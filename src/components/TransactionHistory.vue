@@ -22,8 +22,6 @@ const expandIndexMap = ref<Record<number, boolean>>({})
 
 const props = defineProps<{
   data: TransactionDay[];
-  priceMap:Record<string,number>;
-  washTrade:boolean
 }>();
 
 
@@ -37,13 +35,13 @@ const toggleExpand = (index: number) => {
 
 // 获取总交易量
 const getAmountFormat = (transactions: any[]): string => {
-  const amount = getAmountByTransactions(transactions,props.priceMap,props.washTrade)
+  const amount = getAmountByTransactions(transactions)
   return ValidationUtils.formatMoney(amount)
 }
 
 // 获取总积分
 const getScoreFormat = (transactions: any[]): string => {
-  const amount = getAmountByTransactions(transactions,props.priceMap,props.washTrade)
+  const amount = getAmountByTransactions(transactions)
   const tradeScore = TransactionUtils.calculatePoints(amount);
   return `+${tradeScore}`;
 }

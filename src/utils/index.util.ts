@@ -1,6 +1,10 @@
+import { useAppStore } from "../store/index.store";
+
 const API_KEY = '85c07831-a242-4ace-8494-17720aa97736';
 // const API_URL = `${import.meta.env.VITE_API_URL}/proxy`;
+// const API_URL = "http://proxy.soouu.com/"
 const API_URL = "http://localhost:3000/api/proxy"
+
 const REAL_API_URL  = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
 
 /**
@@ -8,7 +12,7 @@ const REAL_API_URL  = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quote
  * @param tokens 
  * @returns
  */
-export async function fetchTokensPrice(tokens:string[] = []):Promise<Record<string,number>> {
+export async function fetchTokensPrice(tokens:string[] = []) {
   const res:Record<string,number> = {
     'BSC-USD':1
   }
@@ -41,7 +45,8 @@ export async function fetchTokensPrice(tokens:string[] = []):Promise<Record<stri
     console.error('请求失败:', err);
   }
   console.log('----------【res】', res);
-  return res
+  const appStore = useAppStore()
+  appStore.setPriceMap(res)
 }
 
 
@@ -51,8 +56,9 @@ export async function fetchTokensPrice(tokens:string[] = []):Promise<Record<stri
  * @param priceMap
  * @returns 
  */
-export const getAmountByTransactions = (transactions: any[],priceMap:Record<string,number>,showWashTrade = false) => {
-  if(!showWashTrade) {
+export const getAmountByTransactions = (transactions: any[]) => {
+  const { washTradeSwitch,priceMap } = useAppStore()
+  if(!washTradeSwitch) {
     return transactions.reduce((acc, item) => {
       const all = item.tokens?.['BSC-USD']?.outflow || 0
       return acc + all

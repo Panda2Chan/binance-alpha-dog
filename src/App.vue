@@ -17,14 +17,14 @@ import TransactionUtils from './utils/transaction'
 import StorageUtils from './utils/storage'
 import Describe from './components/Describe.vue'
 
-import {fetchTokensPrice ,getAmountByTransactions} from './utils/index.util'
+import { fetchTokensPrice, getAmountByTransactions } from './utils/index.util'
+import { useAppStore } from './store/index.store'
 
-const washTrade =  ref(StorageUtils.load("washTrade",true) || false);
+const appStore = useAppStore()
 const balanceScore = ref<number>(0);
 const filteredTransactions = ref<any[]>([]);
 const isLoading = ref<boolean>(false);
 const searchQuery = ref('');
-const priceMap  = ref<Record<string,number>>({})
 const clearSearch = () => {
   searchQuery.value = '';
 };
@@ -32,10 +32,10 @@ const clearSearch = () => {
 
 // 交易记录中涉及的所有代币tokens
 const allTokens = computed(() => {
-  const res:string[] = filteredTransactions.value.reduce((acc: string[], item: any) => {
+  const res: string[] = filteredTransactions.value.reduce((acc: string[], item: any) => {
     const tokens = Object.keys(item.tokens) as string[];
     return [...acc, ...tokens];
-  },[])
+  }, [])
   // 去重
   return [...new Set(res)]
 })
@@ -51,21 +51,21 @@ const dailyTransactions = computed(() => {
 
 // 今日交易流水
 const todayTransactions = computed(() => {
- const today = new Date();
+  const today = new Date();
   return filteredTransactions.value.filter(transaction => {
-      const transactionDate = new Date(transaction.timeStamp * 1000);
-      return transactionDate.toDateString() === today.toDateString();
-    });
+    const transactionDate = new Date(transaction.timeStamp * 1000);
+    return transactionDate.toDateString() === today.toDateString();
+  });
 })
 // 今日交易量
 const todayAmountFormat = computed(() => {
-  const amount = getAmountByTransactions(todayTransactions.value,priceMap.value)
+  const amount = getAmountByTransactions(todayTransactions.value)
   return ValidationUtils.formatMoney(amount)
 });
 
 // 今日积分
 const todayScoreFormat = computed(() => {
-  const amount = getAmountByTransactions(todayTransactions.value,priceMap.value,washTrade.value)
+  const amount = getAmountByTransactions(todayTransactions.value)
   const tradeScore = TransactionUtils.calculatePoints(amount);
   return `+${tradeScore + balanceScore.value}`;
 });
@@ -74,7 +74,7 @@ const todayScoreFormat = computed(() => {
 /* ----------------------------------- */
 // 总交易量
 const totalAmountFormat = computed(() => {
-  const amount = getAmountByTransactions(filteredTransactions.value,priceMap.value,washTrade.value);
+  const amount = getAmountByTransactions(filteredTransactions.value);
   return ValidationUtils.formatMoney(amount)
 });
 
@@ -82,7 +82,7 @@ const totalAmountFormat = computed(() => {
 const totalScoreFormat = computed(() => {
   // 分别计算每天的积分 然后汇总
   const totalScore = dailyTransactions.value.reduce((acc: number, item: any) => {
-    const amount = getAmountByTransactions(item.transactions,priceMap.value,washTrade.value)
+    const amount = getAmountByTransactions(item.transactions)
     const tradeScore = TransactionUtils.calculatePoints(amount);
     return acc + tradeScore;
   }, 0);
@@ -108,17 +108,22 @@ const handleSearch = async (address: string) => {
 
     isLoading.value = true;
     // 获取交易数据
-    filteredTransactions.value  = await ApiUtils.fetchAddressData(address);
+    filteredTransactions.value = await ApiUtils.fetchAddressData(address);
 
     // 如果没有交易，显示错误
     if (filteredTransactions.value.length === 0) {
       alert('未找到与目标合约的交易记录');
       return;
     }
-    // 计算涉及到的所有代币tokens的价格
-    priceMap.value = await fetchTokensPrice(allTokens.value)
-    
-   
+
+    // 如果统计对刷
+    if (appStore.washTradeSwitch) {
+      // 获取所有代币tokens的价格
+      await fetchTokensPrice(allTokens.value)
+    }
+
+
+
 
 
   } catch (error: any) {
@@ -135,13 +140,7 @@ const handleSearch = async (address: string) => {
     <Header />
     <div class="max-w-6xl mx-auto px-4 py-8">
       <Hero />
-      <SearchBar 
-        v-model="searchQuery"
-        v-model:wash-trade="washTrade"
-        :loading="isLoading" 
-        @clear="clearSearch"
-        @submit="handleSearch"
-      />
+      <SearchBar v-model="searchQuery" :loading="isLoading" @clear="clearSearch" @submit="handleSearch" />
       <!-- <QuickActions /> -->
       <FilterSlider v-model="balanceScore" />
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -149,7 +148,7 @@ const handleSearch = async (address: string) => {
       </div>
       <OverallStats :totalVolume="totalAmountFormat" :totalPoints="totalScoreFormat" />
       <!-- <Calculator /> -->
-      <TransactionHistory :data="dailyTransactions" :priceMap="priceMap" :washTrade="washTrade" />
+      <TransactionHistory :data="dailyTransactions" />
       <Describe />
     </div>
   </div>
