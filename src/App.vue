@@ -17,16 +17,28 @@ import TransactionUtils from './utils/transaction'
 import StorageUtils from './utils/storage'
 import Describe from './components/Describe.vue'
 
+import {fetchTokensPrice ,getAmountByTransactions} from './utils/index.util'
 
+const washTrade =  ref(StorageUtils.load("washTrade",true) || false);
 const balanceScore = ref<number>(0);
 const filteredTransactions = ref<any[]>([]);
-const totalAmount = ref<number>(0);
-const todayAmount = ref<number>(0);
 const isLoading = ref<boolean>(false);
 const searchQuery = ref('');
+const priceMap  = ref<Record<string,number>>({})
 const clearSearch = () => {
   searchQuery.value = '';
 };
+
+
+// 交易记录中涉及的所有代币tokens
+const allTokens = computed(() => {
+  const res:string[] = filteredTransactions.value.reduce((acc: string[], item: any) => {
+    const tokens = Object.keys(item.tokens) as string[];
+    return [...acc, ...tokens];
+  },[])
+  // 去重
+  return [...new Set(res)]
+})
 
 
 // 交易按天分组
@@ -36,36 +48,41 @@ const dailyTransactions = computed(() => {
   })
   return res
 })
+
+// 今日交易流水
+const todayTransactions = computed(() => {
+ const today = new Date();
+  return filteredTransactions.value.filter(transaction => {
+      const transactionDate = new Date(transaction.timeStamp * 1000);
+      return transactionDate.toDateString() === today.toDateString();
+    });
+})
 // 今日交易量
 const todayAmountFormat = computed(() => {
-  return ValidationUtils.formatMoney(todayAmount.value)
+  const amount = getAmountByTransactions(todayTransactions.value,priceMap.value)
+  return ValidationUtils.formatMoney(amount)
 });
+
 // 今日积分
-/**
- * 积分 = 交易量 + 余额
- * 交易量2u 1分；4u 2分；8u 3分；以此类推
- * 余额 0 1 2 3 4 分
- */
 const todayScoreFormat = computed(() => {
-  // 交易量2u 1分；4u 2分；8u 3分；以此类推
-  const tradeScore = TransactionUtils.calculatePoints(todayAmount.value);
+  const amount = getAmountByTransactions(todayTransactions.value,priceMap.value,washTrade.value)
+  const tradeScore = TransactionUtils.calculatePoints(amount);
   return `+${tradeScore + balanceScore.value}`;
 });
-
-
 
 
 /* ----------------------------------- */
 // 总交易量
 const totalAmountFormat = computed(() => {
-  return ValidationUtils.formatMoney(totalAmount.value)
+  const amount = getAmountByTransactions(filteredTransactions.value,priceMap.value,washTrade.value);
+  return ValidationUtils.formatMoney(amount)
 });
 
 // 总积分
 const totalScoreFormat = computed(() => {
   // 分别计算每天的积分 然后汇总
   const totalScore = dailyTransactions.value.reduce((acc: number, item: any) => {
-    const amount = getAmountByTransactions(item.transactions)
+    const amount = getAmountByTransactions(item.transactions,priceMap.value,washTrade.value)
     const tradeScore = TransactionUtils.calculatePoints(amount);
     return acc + tradeScore;
   }, 0);
@@ -74,12 +91,6 @@ const totalScoreFormat = computed(() => {
 })
 
 
-const getAmountByTransactions = (transactions: any[]) => {
-  return transactions.reduce((acc, item) => {
-    const all = item.tokens?.['BSC-USD']?.outflow || 0
-    return acc + all
-  }, 0) * 2
-}
 
 
 const handleSearch = async (address: string) => {
@@ -97,33 +108,17 @@ const handleSearch = async (address: string) => {
 
     isLoading.value = true;
     // 获取交易数据
-    const res = await ApiUtils.fetchAddressData(address);
-    // 保存交易数据
-    filteredTransactions.value = res;
+    filteredTransactions.value  = await ApiUtils.fetchAddressData(address);
 
     // 如果没有交易，显示错误
     if (filteredTransactions.value.length === 0) {
       alert('未找到与目标合约的交易记录');
       return;
     }
-
-    // 计算今日交易量
-    const today = new Date();
-    const todayTransactions = filteredTransactions.value.filter(transaction => {
-      const transactionDate = new Date(transaction.timeStamp * 1000);
-
-      return transactionDate.toDateString() === today.toDateString();
-    });
-
-    /**
-     * * BSC链双倍交易量
-     */
-    todayAmount.value = getAmountByTransactions(todayTransactions);
-
-
-    totalAmount.value = getAmountByTransactions(filteredTransactions.value)
-
-
+    // 计算涉及到的所有代币tokens的价格
+    priceMap.value = await fetchTokensPrice(allTokens.value)
+    
+   
 
 
   } catch (error: any) {
@@ -140,7 +135,13 @@ const handleSearch = async (address: string) => {
     <Header />
     <div class="max-w-6xl mx-auto px-4 py-8">
       <Hero />
-      <SearchBar v-model="searchQuery" :loading="isLoading" @clear="clearSearch" @submit="handleSearch" />
+      <SearchBar 
+        v-model="searchQuery"
+        v-model:wash-trade="washTrade"
+        :loading="isLoading" 
+        @clear="clearSearch"
+        @submit="handleSearch"
+      />
       <!-- <QuickActions /> -->
       <FilterSlider v-model="balanceScore" />
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -148,7 +149,7 @@ const handleSearch = async (address: string) => {
       </div>
       <OverallStats :totalVolume="totalAmountFormat" :totalPoints="totalScoreFormat" />
       <!-- <Calculator /> -->
-      <TransactionHistory :data="dailyTransactions" />
+      <TransactionHistory :data="dailyTransactions" :priceMap="priceMap" :washTrade="washTrade" />
       <Describe />
     </div>
   </div>

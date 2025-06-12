@@ -23,7 +23,7 @@ defineProps<{
         <h4 class="text-sm text-text-secondary mb-2">今日交易量</h4>
         <p class="text-2xl font-bold mb-2">{{ amount }}</p>
         <p class="text-xs text-text-tertiary">
-          还差{{ transactionCount }}笔 +{{ pointsCount }}积分
+          使用【统计对刷】时只能计算代币实时价格，往期数据可能有较大误差
         </p>
       </div>
 

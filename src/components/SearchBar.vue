@@ -3,16 +3,20 @@ import { defineProps, defineEmits, ref } from 'vue';
 import { Loader, Search, X, Trash2 } from 'lucide-vue-next'
 // @ts-ignore
 import StorageUtils from '../utils/storage'
-defineProps<{
+const props = defineProps<{
   modelValue: string
   loading: boolean
+  washTrade:boolean
 }>();
 
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void,
+  (e: 'update:washTrade', value: boolean): void,
   (e: 'clear'): void,
   (e: 'submit', value: string): void
 }>();
+
+
 const addresses = ref(StorageUtils.loadAddresses() || []);
 
 // 控制历史记录框是否显示
@@ -43,6 +47,13 @@ const handleBlur = () => {
     showAddresses.value = false;
   }, 200);
 };
+
+const handleChangeWashTrade = () => {
+  const newValue = !props.washTrade
+  emits('update:washTrade', newValue);
+  StorageUtils.save('washTrade', newValue);
+}
+
 </script>
 
 <template>
@@ -50,7 +61,7 @@ const handleBlur = () => {
     <div class="relative flex items-center">
       <input type="text" :value="modelValue"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)" placeholder="BSC地址 0x123..."
-        class="w-full bg-card-bg border border-card-border rounded-lg py-3 px-4 pr-12 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-binance-yellow/50"
+        class="w-full bg-card-bg border border-card-border rounded-lg py-3 px-4 pr-20 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-binance-yellow/50"
         @focus="handleFocus" @blur="handleBlur" />
       <button v-if="modelValue" @click="$emit('clear')"
         class="absolute right-12 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary p-1">
@@ -58,8 +69,8 @@ const handleBlur = () => {
       </button>
       <button class="absolute right-3 top-1/2 -translate-y-1/2 bg-binance-yellow text-black p-1 rounded"
         @click="$emit('submit', modelValue)">
-        <Search v-show="!loading" />
-        <Loader v-show="loading" class="animate-spin" />
+        <Search v-show="!loading"  />
+        <Loader v-show="loading"   class="animate-spin" />
       </button>
     </div>
     <!-- 历史记录框 -->
@@ -70,10 +81,26 @@ const handleBlur = () => {
           class="text-sm py-2 px-4 flex justify-between items-center" @click="selectAddress(address)">
           <span>{{ address }}</span>
           <button @click.stop="deleteAddress(index)" class="text-text-tertiary hover:text-text-secondary p-1">
-            <Trash2 />
+            <Trash2 :size="16" />
           </button>
         </li>
       </ul>
+    </div>
+
+    <!-- 统计对刷开关 -->
+    <div class="flex items-center justify-end mt-2">
+      <span class="text-sm text-text-secondary mr-2">统计对刷</span>
+      <button 
+        class="w-12 h-6 rounded-full relative transition-colors duration-200 ease-in-out"
+        :class="[washTrade ? 'bg-binance-yellow' : 'bg-gray-600']"
+        @click="handleChangeWashTrade"
+      >
+        <span 
+          class="absolute w-5 h-5 bg-white rounded-full transform transition-transform duration-200 ease-in-out"
+          :class="[washTrade ? 'translate-x-0' : '-translate-x-5']"
+          style="top: 2px;"
+        ></span>
+      </button>
     </div>
   </div>
 </template>

@@ -5,6 +5,7 @@ import ValidationUtils from '../utils/validation'
 import TransactionUtils from '../utils/transaction'
 import { ref } from 'vue';
 import dayjs from 'dayjs'
+import { getAmountByTransactions } from '../utils/index.util';
 
 interface TransactionDay {
   date: string;
@@ -19,8 +20,10 @@ interface TransactionDay {
 
 const expandIndexMap = ref<Record<number, boolean>>({})
 
-defineProps<{
+const props = defineProps<{
   data: TransactionDay[];
+  priceMap:Record<string,number>;
+  washTrade:boolean
 }>();
 
 
@@ -30,24 +33,17 @@ const toggleExpand = (index: number) => {
   expandIndexMap.value[index] = !expandIndexMap.value[index]
 };
 
-const getAmountByTransactions = (transactions: any[]) => {
-  return transactions.reduce((acc, item) => {
-    const all = item.tokens?.['BSC-USD']?.outflow || 0
-    return acc + all
-  }, 0) * 2
-}
-
 
 
 // 获取总交易量
 const getAmountFormat = (transactions: any[]): string => {
-  const amount = getAmountByTransactions(transactions)
+  const amount = getAmountByTransactions(transactions,props.priceMap,props.washTrade)
   return ValidationUtils.formatMoney(amount)
 }
 
 // 获取总积分
 const getScoreFormat = (transactions: any[]): string => {
-  const amount = getAmountByTransactions(transactions)
+  const amount = getAmountByTransactions(transactions,props.priceMap,props.washTrade)
   const tradeScore = TransactionUtils.calculatePoints(amount);
   return `+${tradeScore}`;
 }
